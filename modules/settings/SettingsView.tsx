@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { CyberCard, CyberInput, CyberButton } from '../../components/ui/CyberComponents';
 import { Save, Database, Cpu, ShieldCheck, AlertTriangle, UploadCloud, Terminal, Copy, Github, Globe, RefreshCw, Cloud, CheckCircle2, Code } from 'lucide-react';
-import { isSupabaseConfigured } from '../../core/supabase';
+import { isSupabaseConfigured, getSupabaseClient } from '../../core/supabase';
 import { useProjectStore, useSystemStore, useLeadStore, useChronicleStore } from '../../core/store';
 import { fetchGitHubStatus } from '../../services/githubService';
 
@@ -32,15 +32,28 @@ export const SettingsView: React.FC = () => {
     }
   }, [github]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     localStorage.setItem('SUPABASE_URL', sbUrl);
     localStorage.setItem('SUPABASE_KEY', sbKey);
     setGitHub({ token: ghToken, repo: ghRepo, branch: 'main' });
     
+    // Forçar atualização do cliente Supabase no cache dinâmico
+    getSupabaseClient();
+    
     setStatus('saved');
+    
+    // Em vez de reload(), re-sincronizamos os dados
+    try {
+      await fetchProjects();
+      await fetchLeads();
+      await fetchEvents();
+    } catch (e) {
+      console.error("Erro na re-sincronização automática.");
+    }
+
     setTimeout(() => {
-        window.location.reload();
-    }, 1000);
+        setStatus('idle');
+    }, 2000);
   };
 
   const handleFullSync = async () => {
@@ -57,7 +70,7 @@ export const SettingsView: React.FC = () => {
         alert("SINCRO: Sincronização total concluída com sucesso.");
     } catch (e) {
         console.error(e);
-        alert("Erro na sincronização neural.");
+        alert("Erro na sincronização neural. Verifique se as tabelas existem no Supabase.");
     } finally {
         setSyncing(false);
     }
@@ -72,13 +85,13 @@ create table projects (
   description text,
   status text,
   progress integer,
-  techStack text[],
-  lastUpdated timestamp with time zone default now(),
+  "techStack" text[],
+  "lastUpdated" timestamp with time zone default now(),
   tags text[],
   color text,
   version text,
-  siteUrl text,
-  logoUrl text
+  "siteUrl" text,
+  "logoUrl" text
 );
 
 create table leads (
@@ -88,7 +101,7 @@ create table leads (
   value numeric,
   status text,
   probability integer,
-  lastContact timestamp with time zone default now()
+  "lastContact" timestamp with time zone default now()
 );
 
 create table chronicle_events (
@@ -96,11 +109,11 @@ create table chronicle_events (
   timestamp timestamp with time zone default now(),
   type text,
   module text,
-  entityId text,
-  entityName text,
+  "entityId" text,
+  "entityName" text,
   actor jsonb,
   snapshot jsonb,
-  aiAnalysis jsonb
+  "aiAnalysis" jsonb
 );`;
 
   return (
@@ -138,7 +151,7 @@ create table chronicle_events (
               
               <div className="mt-6 pt-6 border-t border-white/5 space-y-4">
                   <CyberButton onClick={handleSave} glow className="w-full bg-neon-cyan/10 border-neon-cyan text-neon-cyan">
-                     {status === 'saved' ? 'SISTEMA REINICIANDO...' : 'SALVAR CREDENCIAIS'}
+                     {status === 'saved' ? 'SISTEMA ATUALIZADO!' : 'SALVAR E SINCRONIZAR'}
                   </CyberButton>
 
                   <div className="flex items-center gap-3 p-4 bg-neon-yellow/5 border border-neon-yellow/20 rounded">

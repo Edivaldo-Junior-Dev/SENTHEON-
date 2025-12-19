@@ -1,7 +1,7 @@
 
 import { create } from 'zustand';
 import { Project, BrandResult, MOCK_PROJECTS, AgentConfig, GitHubConfig, ChronicleEvent, Lead, LogoRequest } from '../types';
-import { supabase, isSupabaseConfigured } from './supabase';
+import { getSupabaseClient, isSupabaseConfigured } from './supabase';
 import { generateLogo } from '../services/geminiService';
 
 interface ProjectStore {
@@ -26,7 +26,8 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
       return;
     }
     try {
-      const { data, error } = await supabase.from('projects').select('*').order('last_updated', { ascending: false });
+      const client = getSupabaseClient();
+      const { data, error } = await client.from('projects').select('*').order('lastUpdated', { ascending: false });
       if (error) throw error;
       set({ projects: data && data.length > 0 ? (data as any) : MOCK_PROJECTS, isLoading: false });
     } catch (e) {
@@ -35,13 +36,15 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
   },
   addProject: async (p) => {
     if (isSupabaseConfigured()) {
-      await supabase.from('projects').insert([p]);
+      const client = getSupabaseClient();
+      await client.from('projects').insert([p]);
     }
     set(s => ({ projects: [p, ...s.projects] }));
   },
   updateProject: async (id, up) => {
     if (isSupabaseConfigured()) {
-      await supabase.from('projects').update(up).eq('id', id);
+      const client = getSupabaseClient();
+      await client.from('projects').update(up).eq('id', id);
     }
     set(s => ({ 
       projects: s.projects.map(p => p.id === id ? {...p, ...up, lastUpdated: new Date().toISOString()} : p) 
@@ -49,7 +52,8 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
   },
   deleteProject: async (id) => {
     if (isSupabaseConfigured()) {
-      await supabase.from('projects').delete().eq('id', id);
+      const client = getSupabaseClient();
+      await client.from('projects').delete().eq('id', id);
     }
     set(s => ({ projects: s.projects.filter(p => p.id !== id) }));
   },
@@ -57,7 +61,8 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
     if (!isSupabaseConfigured()) return;
     set({ isLoading: true });
     try {
-      await supabase.from('projects').upsert(MOCK_PROJECTS);
+      const client = getSupabaseClient();
+      await client.from('projects').upsert(MOCK_PROJECTS);
       await get().fetchProjects();
     } catch (e) {
       set({ isLoading: false });
@@ -119,7 +124,8 @@ export const useLeadStore = create<LeadStore>((set, get) => ({
       return;
     }
     try {
-      const { data, error } = await supabase.from('leads').select('*').order('value', { ascending: false });
+      const client = getSupabaseClient();
+      const { data, error } = await client.from('leads').select('*').order('value', { ascending: false });
       if (error) throw error;
       set({ leads: (data as any) || [], isLoading: false });
     } catch (e) {
@@ -128,19 +134,22 @@ export const useLeadStore = create<LeadStore>((set, get) => ({
   },
   addLead: async (l) => {
     if (isSupabaseConfigured()) {
-      await supabase.from('leads').insert([l]);
+      const client = getSupabaseClient();
+      await client.from('leads').insert([l]);
     }
     set(s => ({ leads: [l, ...s.leads] }));
   },
   updateLead: async (id, up) => {
     if (isSupabaseConfigured()) {
-      await supabase.from('leads').update(up).eq('id', id);
+      const client = getSupabaseClient();
+      await client.from('leads').update(up).eq('id', id);
     }
     set(s => ({ leads: s.leads.map(l => l.id === id ? {...l, ...up} : l) }));
   },
   deleteLead: async (id) => {
     if (isSupabaseConfigured()) {
-      await supabase.from('leads').delete().eq('id', id);
+      const client = getSupabaseClient();
+      await client.from('leads').delete().eq('id', id);
     }
     set(s => ({ leads: s.leads.filter(l => l.id !== id) }));
   }
@@ -165,7 +174,8 @@ export const useChronicleStore = create<ChronicleStore>((set) => ({
       return;
     }
     try {
-      const { data, error } = await supabase.from('chronicle_events').select('*').order('timestamp', { ascending: false });
+      const client = getSupabaseClient();
+      const { data, error } = await client.from('chronicle_events').select('*').order('timestamp', { ascending: false });
       if (error) throw error;
       set({ events: (data as any) || [], isLoading: false });
     } catch (e) {
@@ -174,7 +184,8 @@ export const useChronicleStore = create<ChronicleStore>((set) => ({
   },
   addEvent: async (e) => {
     if (isSupabaseConfigured()) {
-      await supabase.from('chronicle_events').insert([e]);
+      const client = getSupabaseClient();
+      await client.from('chronicle_events').insert([e]);
     }
     set(s => {
       const updated = [e, ...s.events];
@@ -184,7 +195,8 @@ export const useChronicleStore = create<ChronicleStore>((set) => ({
   },
   clearEvents: async () => {
     if (isSupabaseConfigured()) {
-      await supabase.from('chronicle_events').delete().neq('id', '');
+      const client = getSupabaseClient();
+      await client.from('chronicle_events').delete().neq('id', '');
     }
     localStorage.removeItem('sentheon_chronicle_events_v4');
     set({ events: [] });
