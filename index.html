@@ -1,0 +1,78 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SENTHEON v4.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;700&family=Orbitron:wght@400;500;700;900&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              void: {
+                DEFAULT: '#050814',
+                light: '#0F172A',
+                dark: '#020617'
+              },
+              neon: {
+                yellow: '#FFFF00',
+                cyan: '#00F0FF',
+                magenta: '#FF00FF',
+                green: '#00FF41',
+                red: '#FF3131',
+                orange: '#FF5F1F', // HubSpot Style
+                blue: '#1F51FF',
+              },
+            },
+            fontFamily: {
+              'cyber': ['"Orbitron"', 'monospace'],
+              'mono': ['"Fira Code"', 'monospace'],
+              'sans': ['"Inter"', 'sans-serif']
+            },
+            backgroundImage: {
+              'cyber-grid': "linear-gradient(rgba(255, 95, 31, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 95, 31, 0.03) 1px, transparent 1px), radial-gradient(circle at 50% 50%, rgba(5, 8, 20, 1) 0%, rgba(2, 6, 23, 1) 100%)"
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        background-color: #020617;
+        color: white;
+        overflow-x: hidden;
+      }
+      .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+      .custom-scrollbar::-webkit-scrollbar-track { background: #020617; }
+      .custom-scrollbar::-webkit-scrollbar-thumb { background: #FF5F1F; border-radius: 10px; }
+      .glass-panel { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 95, 31, 0.1); }
+      .hexagon-clip { clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
+    </style>
+    <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@19.0.0",
+    "react/": "https://esm.sh/react@19.0.0/",
+    "react-dom": "https://esm.sh/react-dom@19.0.0",
+    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
+    "@google/genai": "https://esm.sh/@google/genai@1.33.0",
+    "zustand": "https://esm.sh/zustand@5.0.1?external=react",
+    "react-router-dom": "https://esm.sh/react-router-dom@7.1.0?external=react,react-dom",
+    "lucide-react": "https://esm.sh/lucide-react@0.460.0?external=react",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.46.1",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
+  }
+}
+</script>
+  </head>
+  <body class="bg-cyber-grid bg-fixed">
+    <div id="root"></div>
+    <script type="module" src="index.tsx"></script>
+  </body>
+</html>

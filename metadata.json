@@ -1,0 +1,7 @@
+{
+  "name": "SENTHEON v4.0",
+  "description": "A cyberpunk AI-powered project management and brand generation platform.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
